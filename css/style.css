@@ -324,3 +324,16 @@ body {
     color: #2563eb;
     text-decoration: underline;
 }
+.kanban-item-content:empty:before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  pointer-events: none;
+}
+.column.empty::after {
+  content: "Double click in the column or click the + button to create a new item";
+  color: #bbb;
+  font-style: italic;
+  text-align: center;
+  display: block;
+  padding: 8px;
+}
