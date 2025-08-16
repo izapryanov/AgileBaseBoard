@@ -437,20 +437,24 @@ const createNewKanbanItem = (itemText, targetColumn = null) => {
  * Ignores double-clicks that happen on existing items or on column headers/buttons.
  */
 const handleColumnDoubleClick = (e) => {
-  const column = e.currentTarget;
-  if (!column) return;
+    const column = e.currentTarget;
+    if (!column) return;
 
-  // If double-click happened on an item or header or delete buttons, ignore it
-  if (e.target.closest('.kanban-item') ||
-      e.target.closest('.column-header') ||
-      e.target.closest('.delete-item-btn') ||
-      e.target.closest('.delete-column-btn')) {
+    // If double-click happened on an item or header or delete buttons, ignore it
+    if (e.target.closest('.kanban-item') ||
+        e.target.closest('.column-header') ||
+        e.target.closest('.delete-item-btn') ||
+        e.target.closest('.delete-column-btn')) {
     return;
-  }
+    }
 
-  // Create an empty (editable) item in this column
-  createNewKanbanItem('', column);
-  updateColumnPlaceholders();
+    // Create an empty (editable) item in this column
+    const newItem = createNewKanbanItem('', column);
+
+    // Focus the editable span after adding
+    newItem.querySelector('.kanban-item-content').focus();
+
+    updateColumnPlaceholders();
 };
 
         
