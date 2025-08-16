@@ -428,7 +428,6 @@ const createNewKanbanItem = (itemText, targetColumn = null) => {
         initializeItemListeners();
         initializeDeleteItemButtons();
     }
-
     return newItem;
 };
 
@@ -450,11 +449,7 @@ const handleColumnDoubleClick = (e) => {
   }
 
   // Create an empty (editable) item in this column
-  const newItem = createNewKanbanItem('', column);
-
-  // Focus the editable span after adding
-  newItem.querySelector('.kanban-item-content').focus();
-  
+  createNewKanbanItem('', column);
   updateColumnPlaceholders();
 };
 
