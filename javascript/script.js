@@ -614,14 +614,103 @@ gitHubBtn.addEventListener("click", () => {
 
 //Handle export board 
 exportBtn.addEventListener("click", () => {
-    // TODO: Implement export logic
-    alert("Export clicked (TODO)");
+    const boardTitle = document.getElementById('board-title').innerText.trim();
+
+    // Collect column titles in order
+    const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
+        .map(column => column.querySelector('.column-title').innerText.trim());
+
+    // Collect all items with their column reference
+    const items = [];
+    Array.from(document.querySelectorAll('.kanban-container .column')).forEach(column => {
+        const columnTitle = column.querySelector('.column-title').innerText.trim();
+        Array.from(column.querySelectorAll('.kanban-item')).forEach(item => {
+            const text = item.querySelector('.kanban-item-content').innerText.trim();
+            items.push({ text, column: columnTitle });
+        });
+    });
+
+    // Construct flat JSON object
+    const boardData = {
+        title: boardTitle,
+        columns: columns,
+        items: items
+    };
+
+    // Convert to JSON string
+    const jsonString = JSON.stringify(boardData, null, 4);
+
+    // Trigger download
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${boardTitle.replace(/\s+/g, '_')}_board.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 });
 
 //Handle import board
 importBtn.addEventListener("click", () => {
-    // TODO: Implement import logic
-    alert("Import clicked (TODO)");
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+
+    fileInput.addEventListener('change', event => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+
+                // Clear existing board
+                kanbanContainer.innerHTML = '';
+                columnCounter = 0;
+                itemCounter = 0;
+
+                // Set board title
+                const boardTitleElem = document.getElementById('board-title');
+                boardTitleElem.innerText = data.title || 'Agile Base Board';
+
+                const columnsMap = {};
+
+                // Create columns in order using existing function
+                data.columns.forEach(colTitle => {
+                    createNewColumn(); // increments columnCounter
+                    const newColumn = kanbanContainer.lastElementChild;
+                    const titleElem = newColumn.querySelector('.column-title');
+                    titleElem.innerText = colTitle;
+                    columnsMap[colTitle] = newColumn;
+                });
+
+                // Add items using existing function
+                data.items.forEach(item => {
+                    const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
+                    createNewKanbanItem(item.text, targetColumn);
+                });
+
+                // Re-initialize listeners for drag/drop, delete buttons, placeholders
+                initializeColumnListeners();
+                initializeItemListeners();
+                initializeDeleteColumnButtons();
+                initializeDeleteItemButtons();
+                updateColumnPlaceholders();
+                
+
+            } catch (err) {
+                alert('Failed to import board: ' + err.message);
+            }
+        };
+
+        reader.readAsText(file);
+    });
+
+    fileInput.click();
+    sandwichMenu.style.display = "none";
 });
 
 // Hide menu when clicking outside
