@@ -1,2 +1,2 @@
 # Agile Base Board
-Agile base board for simple personal or team tasks tracking
+Basic agile board for simple personal or team tasks tracking

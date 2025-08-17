@@ -7,10 +7,64 @@
     <link rel="stylesheet" href="\css\style.css">
 </head>
 <body>
-    
     <!-- Board Title -->
     <div class="board-title-container">
+        <div class="sandwich-btn-container">
+            <!-- Sandwich button (left) -->
+            <button id="sandwich-btn" class="icon-btn">
+                <!-- Hamburger icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+            <!-- Sandwich Menu -->
+            <div id="sandwich-menu" class="top-menu">
+                <button id="export-btn">
+                    <!-- Download icon -->
+                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" 
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21V9m0 0l-4 4m4-4l4 4M4 3h16" />
+                    </svg>
+                    Export
+                </button>
+                <button id="import-btn">
+                    <!-- Upload icon -->
+                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 17h16" />
+                        <path d="M12 3v10m0 0l-4-4m4 4l4-4" />
+                    </svg>
+                    Import
+                </button>
+                <button id="github-btn">
+                    <!-- GitHub icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
+                        fill="currentColor">
+                        <path d="M12 1C5.925 1 1 5.925 1 12c0 4.867 3.164 8.994 7.546 10.437.552.101.754-.24.754-.534 
+                                0-.263-.009-1.14-.014-2.07-3.072.668-3.721-1.481-3.721-1.481-.502-1.274-1.226-1.615-1.226-1.615
+                                -.999-.683.076-.669.076-.669 1.105.078 1.686 1.136 1.686 1.136.982 1.683 2.577 1.197 
+                                3.206.916.1-.712.384-1.197.698-1.472-2.452-.28-5.03-1.227-5.03-5.463 
+                                0-1.206.431-2.192 1.137-2.964-.114-.28-.493-1.406.108-2.93 
+                                0 0 .927-.297 3.036 1.131a10.617 10.617 0 012.766-.372c.938.004 1.88.126 2.766.372 
+                                2.108-1.428 3.034-1.131 3.034-1.131.603 1.524.225 2.65.11 2.93.707.772 1.136 
+                                1.758 1.136 2.964 0 4.247-2.582 5.179-5.041 5.454.393.34.743 1.007.743 
+                                2.029 0 1.464-.013 2.644-.013 3.003 0 .296.2.64.76.532C19.837 20.994 
+                                23 16.867 23 12c0-6.075-4.925-11-11-11z"/>
+                    </svg>
+                    GitHub
+                </button>
+            </div>
+        </div>
+
+        <!-- Title -->
         <h1 id="board-title" contenteditable="true">Agile Base Board</h1>
+
+        <!-- Help button (right) -->
+        <button id="help-btn" class="icon-btn">?</button>
+
     </div>
 
     <!-- Board Container -->

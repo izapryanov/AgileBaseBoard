@@ -8,6 +8,12 @@ const createItemModal = document.getElementById('create-item-modal');
 const createNewItemBtn = document.getElementById('create-new-item-btn');
 const cancelCreateItemBtn = document.getElementById('cancel-create-item-btn');
 const newItemInput = document.getElementById('new-item-input');
+const sandwichBtn = document.getElementById("sandwich-btn");
+const sandwichMenu = document.getElementById("sandwich-menu");
+const helpBtn = document.getElementById("help-btn");
+const gitHubBtn = document.getElementById("github-btn");
+const exportBtn = document.getElementById("export-btn");
+const importBtn = document.getElementById("import-btn");
 
 let columnCounter = 3;
 let itemCounter = 1;
@@ -590,6 +596,41 @@ createItemModal.addEventListener('click', (e) => {
         newItemInput.value = '';
     }
 });
+
+//Show the sandwitch button menu
+sandwichBtn.addEventListener("click", () => {
+    sandwichMenu.style.display = sandwichMenu.style.display === "flex" ? "none" : "flex";
+});
+
+//Open readme.md when help button is clicked
+helpBtn.addEventListener("click", () => {
+    window.open("https://github.com/izapryanov/AgileBaseBoard/blob/main/README.md", "_blank");
+});
+
+//Open GitHub project page for Agile Base Board
+gitHubBtn.addEventListener("click", () => {
+    window.open("https://github.com/izapryanov/AgileBaseBoard", "_blank");
+});
+
+//Handle export board 
+exportBtn.addEventListener("click", () => {
+    // TODO: Implement export logic
+    alert("Export clicked (TODO)");
+});
+
+//Handle import board
+importBtn.addEventListener("click", () => {
+    // TODO: Implement import logic
+    alert("Import clicked (TODO)");
+});
+
+// Hide menu when clicking outside
+document.addEventListener("click", (e) => {
+    if (!sandwichBtn.contains(e.target) && !sandwichMenu.contains(e.target)) {
+        sandwichMenu.style.display = "none";
+    }
+});
+
 
 // Initial setup for the existing elements
 initializeItemListeners();
