@@ -720,6 +720,59 @@ document.addEventListener("click", (e) => {
     }
 });
 
+//Import from a JSON export stored on GitHub via raw github link
+function importBoardFromURL(url) {
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not OK');
+            return response.json();
+        })
+        .then(data => {
+            // Clear existing board
+            kanbanContainer.innerHTML = '';
+            columnCounter = 0;
+            itemCounter = 0;
+
+            // Set board title
+            const boardTitleElem = document.getElementById('board-title');
+            boardTitleElem.innerText = data.title || 'Agile Base Board';
+
+            const columnsMap = {};
+
+            // Create columns
+            data.columns.forEach(colTitle => {
+                createNewColumn(); 
+                const newColumn = kanbanContainer.lastElementChild;
+                const titleElem = newColumn.querySelector('.column-title');
+                titleElem.innerText = colTitle;
+                columnsMap[colTitle] = newColumn;
+            });
+
+            // Add items
+            data.items.forEach(item => {
+                const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
+                createNewKanbanItem(item.text, targetColumn);
+            });
+
+            // Reinitialize listeners
+            initializeColumnListeners();
+            initializeItemListeners();
+            initializeDeleteColumnButtons();
+            initializeDeleteItemButtons();
+            updateColumnPlaceholders();
+        }).catch(err => alert('Failed to import board: ' + err.message));
+}
+
+//Attach the URL param listener to the DOM
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const importURL = params.get('import');
+    if (importURL) {
+        importBoardFromURL(importURL);
+    }
+});
+
+
 
 // Initial setup for the existing elements
 initializeItemListeners();
