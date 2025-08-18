@@ -1,0 +1,66 @@
+{
+    "title": "Agile Base Board",
+    "columns": [
+        "To Do",
+        "In Progress",
+        "Done"
+    ],
+    "items": [
+        {
+            "text": "Add export to GitHub: 1. Exports the content of the board in a JSON format, and keeps it in the copy buffer; 2. Then opens GitHub edit link to the previously imported JSON export stored in GitHub.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add dark/night mode",
+            "column": "To Do"
+        },
+        {
+            "text": "Investigate how to fix cursor not moving while on mouse click in the text, while editing an item.",
+            "column": "To Do"
+        },
+        {
+            "text": "Create GitHub pages page for the project",
+            "column": "To Do"
+        },
+        {
+            "text": "Buy a proper domain name",
+            "column": "To Do"
+        },
+        {
+            "text": "Add browser local storage caching to prevent losing work in progress.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add a clear board option, either a button or as a sandwich menu item, to clear the board content and cached state in the browser e local store.",
+            "column": "To Do"
+        },
+        {
+            "text": "Investigate what is best to do with the separate page and column vertical scrolls, to create better UX.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add ID to the item - generated based on the board name.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add title to the items",
+            "column": "To Do"
+        },
+        {
+            "text": "Add estimation to the items",
+            "column": "To Do"
+        },
+        {
+            "text": "Add color flag to the items",
+            "column": "To Do"
+        },
+        {
+            "text": "Add configuration accessible through the sandwich menu, to configure basic/advanced mode. Advanced mode will include the title, color flag, ID, estimation, etc. Basic will be just flat items with text only.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add url parameter 'import' to be used with GitHub raw link and import json exports sotred in a GitHub project.",
+            "column": "In Progress"
+        }
+    ]
+}
