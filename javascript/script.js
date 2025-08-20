@@ -14,6 +14,7 @@ const helpBtn = document.getElementById("help-btn");
 const gitHubBtn = document.getElementById("github-btn");
 const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
+const clearBtn = document.getElementById("clear-board-btn");
 
 let columnCounter = 3;
 let itemCounter = 1;
@@ -32,6 +33,11 @@ const itemModal = document.getElementById('item-confirmation-modal');
 const confirmDeleteItemBtn = document.getElementById('confirm-delete-item-btn');
 const cancelDeleteItemBtn = document.getElementById('cancel-delete-item-btn');
 let itemToDelete = null;
+
+// Confirmation modal elements for board clear
+const clearBoardModal = document.getElementById('confirm-clear-modal');
+const confirmClearBoardBtn = document.getElementById('confirm-clear-board-btn');
+const cancelClearBoardBtn = document.getElementById('cancel-clear-board-btn');
 
 
 /**
@@ -713,6 +719,73 @@ importBtn.addEventListener("click", () => {
     sandwichMenu.style.display = "none";
 });
 
+//Handle clear board
+//Hanlde clear board menu item click
+clearBtn.addEventListener("click", () => {
+  sandwichMenu.style.display = "none";
+  clearBoardModal.style.display = 'flex';
+});
+
+//Handle clear board confirm
+confirmClearBoardBtn.addEventListener("click", () => {
+    kanbanContainer.innerHTML = ` <!-- To Do Column -->
+        <div id="todo-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">To Do</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Placeholder item -->
+            <div id="item-1" draggable="true" class="kanban-item">
+                <span class="kanban-item-content" contenteditable="true" data-placeholder="Start typing here"></span>
+                <button class="delete-item-btn">
+                    <!-- Trash can icon for deleting an item -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div id="in-progress-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">In Progress</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Done Column -->
+        <div id="done-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">Done</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>`;
+    initializeBoard();
+    clearBoardModal.style.display = 'none';
+
+});
+
+//Handle clear board cancel
+cancelClearBoardBtn.addEventListener("click", () => {
+    clearBoardModal.style.display = 'none';
+});
+
 // Hide menu when clicking outside
 document.addEventListener("click", (e) => {
     if (!sandwichBtn.contains(e.target) && !sandwichMenu.contains(e.target)) {
@@ -775,8 +848,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 // Initial setup for the existing elements
-initializeItemListeners();
-initializeColumnListeners();
-initializeDeleteColumnButtons();
-initializeDeleteItemButtons();
-updateColumnPlaceholders();
+const initializeBoard = () =>{
+    initializeItemListeners();
+    initializeColumnListeners();
+    initializeDeleteColumnButtons();
+    initializeDeleteItemButtons();
+    updateColumnPlaceholders();
+}
+
+initializeBoard();

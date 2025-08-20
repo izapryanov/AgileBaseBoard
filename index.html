@@ -39,6 +39,10 @@
                     </svg>
                     Import
                 </button>
+                    <button id="clear-board-btn">
+                       <b>CLR</b>
+                        Clear
+                    </button>
                 <button id="github-btn">
                     <!-- GitHub icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
@@ -168,6 +172,17 @@
             <div class="modal-buttons">
                 <button id="confirm-delete-item-btn" class="confirm-btn">Yes, delete it</button>
                 <button id="cancel-delete-item-btn" class="cancel-btn">No, keep it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Board Clearing -->
+    <div id="confirm-clear-modal" class="modal">
+        <div class="modal-content">
+            <p class="text-lg mb-4">Are you sure you want to clear the entire board - added columns and items will be lost?</p>
+            <div class="modal-actions">
+                <button id="confirm-clear-board-btn" class="confirm-btn">Yes, clear it</button>
+                <button id="cancel-clear-board-btn" class="cancel-btn">No, keep it</button>
             </div>
         </div>
     </div>
