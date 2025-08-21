@@ -1,5 +1,16 @@
 # Agile Base Board
 
+## Table of Contents
+- [Introduction](#introduction)
+- [How to Use](#how-to-use)
+  - [Board Setup](#board-setup)
+  - [Columns](#columns)
+  - [Items](#items)
+  - [Drag & Drop](#drag--drop)
+  - [Export / Import](#export--import)
+  - [Additional Features](#additional-features)
+- [License and Attribution](#license-and-attribution)
+
 ## Introduction
 
 **Agile Base Board** is a lightweight, web-based Kanban-style task management board designed to help you organize tasks efficiently.  
