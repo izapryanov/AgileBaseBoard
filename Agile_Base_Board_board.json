@@ -31,10 +31,6 @@
             "column": "To Do"
         },
         {
-            "text": "Add a clear board option, either a button or as a sandwich menu item, to clear the board content and cached state in the browser e local store.",
-            "column": "To Do"
-        },
-        {
             "text": "Investigate what is best to do with the separate page and column vertical scrolls, to create better UX.",
             "column": "To Do"
         },
@@ -57,6 +53,10 @@
         {
             "text": "Add configuration accessible through the sandwich menu, to configure basic/advanced mode. Advanced mode will include the title, color flag, ID, estimation, etc. Basic will be just flat items with text only.",
             "column": "To Do"
+        },
+        {
+            "text": "Add a clear board option, either a button or as a sandwich menu item, to clear the board content and cached state in the browser e local store.",
+            "column": "In Progress"
         },
         {
             "text": "Add url parameter 'import' to be used with GitHub raw link and import json exports sotred in a GitHub project. - [DONE Note: Don't use the \"/ref/head/main/\" url, it lacks behind, use the \"/main/\" only url]",
