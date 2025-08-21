@@ -54,6 +54,7 @@ All changes are reflected in real-time, and the board can be exported or importe
 - **Help Button:** Opens the GitHub README for guidance.
 - **GitHub Button:** Opens the project page on GitHub.
 - **Responsive Design:** Works on desktop, tablet, and mobile devices.
+- **Clear Button:** Clears all items and columns added from the user and resets the board to the inital load state. Note: if there is import via url parameter, the imported state is considered inital load state.
 
 ---
 
