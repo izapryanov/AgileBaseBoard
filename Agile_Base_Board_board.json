@@ -61,6 +61,10 @@
         {
             "text": "Add url parameter 'import' to be used with GitHub raw link and import json exports sotred in a GitHub project. - [DONE Note: Don't use the \"/ref/head/main/\" url, it lacks behind, use the \"/main/\" only url]",
             "column": "Done"
+        },
+        {
+            "text": "Add feedback button in the sandwitch menu and link it to a google form.",
+            "column": "Done"
         }
     ]
 }
