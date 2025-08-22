@@ -15,6 +15,7 @@ const gitHubBtn = document.getElementById("github-btn");
 const exportBtn = document.getElementById("export-btn");
 const importBtn = document.getElementById("import-btn");
 const clearBtn = document.getElementById("clear-board-btn");
+const feedbackBtn = document.getElementById("feedback-btn");
 
 let columnCounter = 3;
 let itemCounter = 1;
@@ -617,6 +618,11 @@ helpBtn.addEventListener("click", () => {
 gitHubBtn.addEventListener("click", () => {
     window.open("https://github.com/izapryanov/AgileBaseBoard", "_blank");
 });
+
+//Open feedback form
+feedbackBtn.addEventListener("click", () =>{
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdVyhnGg3mFAXMetWCYGsaE7bcYXUvR2nf6sE9rDDxddEWapQ/viewform?usp=header", "_blank");
+})
 
 //Handle export board 
 exportBtn.addEventListener("click", () => {
