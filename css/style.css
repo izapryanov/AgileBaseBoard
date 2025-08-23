@@ -22,7 +22,7 @@ body {
     font-weight: bold;
     color: #1f2937;
     outline: none;
-    cursor: pointer;
+    cursor: text;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     transition: background-color 0.2s;
@@ -102,6 +102,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    cursor: grab; /* show grab cursor for draggable area */
 }
 
 .kanban-item:hover {
@@ -113,6 +114,7 @@ body {
 .kanban-item-content {
     flex-grow: 1;
     outline: none;
+    cursor: text; /* normal cursor when hovering text */
 }
 
 .kanban-item-content:focus {
@@ -168,6 +170,7 @@ body {
     transition: color 0.2s;
     margin-left: 0.5rem;
     line-height: 1;
+    cursor: text; /* normal cursor when hovering text */
 }
 
 .delete-item-btn:hover {

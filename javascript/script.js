@@ -291,16 +291,38 @@ const getDragAfterElement = (column, y) => {
  * Attaches drag and touch listeners to all existing items.
  */
 const initializeItemListeners = () => {
-    const items = document.querySelectorAll('.kanban-item');
-    items.forEach(item => {
-        item.removeEventListener('dragstart', handleItemDragStart);
-        item.removeEventListener('dragend', handleItemDragEnd);
-        item.removeEventListener('touchstart', handleItemTouchStart);
+  const items = document.querySelectorAll('.kanban-item');
 
-        item.addEventListener('dragstart', handleItemDragStart);
-        item.addEventListener('dragend', handleItemDragEnd);
-        item.addEventListener('touchstart', handleItemTouchStart);
+  items.forEach(item => {
+    const content = item.querySelector('.kanban-item-content');
+    const delBtn = item.querySelector('.delete-item-btn');
+
+    // --- Prevent drag when interacting with editable text
+    content.addEventListener('mousedown', () => {
+      item.draggable = false;
     });
+    content.addEventListener('mouseup', () => {
+      item.draggable = true;
+    });
+    content.addEventListener('mouseleave', () => {
+      item.draggable = true;
+    });
+
+    // --- Prevent drag when clicking delete button
+    delBtn.addEventListener('mousedown', () => {
+      item.draggable = false;
+    });
+    delBtn.addEventListener('mouseup', () => {
+      item.draggable = true;
+    });
+    delBtn.addEventListener('mouseleave', () => {
+      item.draggable = true;
+    });
+
+    // Your normal drag events
+    item.addEventListener('dragstart', handleItemDragStart);
+    item.addEventListener('dragend', handleItemDragEnd);
+  });
 };
 
 /**

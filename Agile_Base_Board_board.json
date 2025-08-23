@@ -15,10 +15,6 @@
             "column": "To Do"
         },
         {
-            "text": "Investigate how to fix cursor not moving while on mouse click in the text, while editing an item.",
-            "column": "To Do"
-        },
-        {
             "text": "Create GitHub pages page for the project",
             "column": "To Do"
         },
@@ -64,6 +60,10 @@
         },
         {
             "text": "Add feedback button in the sandwitch menu and link it to a google form.",
+            "column": "Done"
+        },
+        {
+            "text": "Investigate how to fix cursor not moving while on mouse click in the text, while editing an item. [DONE Note: Made \"grabbable\" only the area around the typing field]",
             "column": "Done"
         }
     ]
