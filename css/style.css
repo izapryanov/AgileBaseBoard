@@ -170,7 +170,6 @@ body {
     transition: color 0.2s;
     margin-left: 0.5rem;
     line-height: 1;
-    cursor: text; /* normal cursor when hovering text */
 }
 
 .delete-item-btn:hover {

@@ -462,6 +462,94 @@ const createNewKanbanItem = (itemText, targetColumn = null) => {
     return newItem;
 };
 
+//Export board function
+const exportBoard = () =>{
+    const boardTitle = document.getElementById('board-title').innerText.trim();
+
+    // Collect column titles in order
+    const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
+        .map(column => column.querySelector('.column-title').innerText.trim());
+
+    // Collect all items with their column reference
+    const items = [];
+    Array.from(document.querySelectorAll('.kanban-container .column')).forEach(column => {
+        const columnTitle = column.querySelector('.column-title').innerText.trim();
+        Array.from(column.querySelectorAll('.kanban-item')).forEach(item => {
+            const text = item.querySelector('.kanban-item-content').innerText.trim();
+            items.push({ text, column: columnTitle });
+        });
+    });
+
+    // Construct flat JSON object
+    const boardData = {
+        title: boardTitle,
+        columns: columns,
+        items: items
+    };
+
+    // Convert to JSON string
+    const jsonString = JSON.stringify(boardData, null, 4);
+
+    // Trigger download
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${boardTitle.replace(/\s+/g, '_')}_board.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+//Import board data
+const importBoardData = (data) => {
+    try {
+         // Clear existing board
+        kanbanContainer.innerHTML = '';
+        columnCounter = 0;
+        itemCounter = 0;
+
+        // Set board title
+        const boardTitleElem = document.getElementById('board-title');
+        boardTitleElem.innerText = data.title || 'Agile Base Board';
+
+        const columnsMap = {};
+
+        // Create columns in order using existing function
+        data.columns.forEach(colTitle => {
+            createNewColumn(); // increments columnCounter
+            const newColumn = kanbanContainer.lastElementChild;
+            const titleElem = newColumn.querySelector('.column-title');
+            titleElem.innerText = colTitle;
+            columnsMap[colTitle] = newColumn;
+        });
+
+        // Add items using existing function
+        data.items.forEach(item => {
+            const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
+            createNewKanbanItem(item.text, targetColumn);
+        });
+
+        // Re-initialize listeners for drag/drop, delete buttons, placeholders
+        initializeBoard();
+    } catch (err) {
+        alert('Failed to import board data: ' + err.message);
+    }
+}
+
+//Import from a JSON export stored on GitHub via raw github link
+function importBoardFromURL(url) {
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not OK');
+            return response.json();
+        })
+        .then(data => {
+            importBoardData(data);
+        }).catch(err => alert('Failed to import board: ' + err.message));
+}
+
 
 /**
  * Handles double-clicks on a column to add a new empty item to that column.
@@ -643,44 +731,7 @@ feedbackBtn.addEventListener("click", () =>{
 })
 
 //Handle export board 
-exportBtn.addEventListener("click", () => {
-    const boardTitle = document.getElementById('board-title').innerText.trim();
-
-    // Collect column titles in order
-    const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
-        .map(column => column.querySelector('.column-title').innerText.trim());
-
-    // Collect all items with their column reference
-    const items = [];
-    Array.from(document.querySelectorAll('.kanban-container .column')).forEach(column => {
-        const columnTitle = column.querySelector('.column-title').innerText.trim();
-        Array.from(column.querySelectorAll('.kanban-item')).forEach(item => {
-            const text = item.querySelector('.kanban-item-content').innerText.trim();
-            items.push({ text, column: columnTitle });
-        });
-    });
-
-    // Construct flat JSON object
-    const boardData = {
-        title: boardTitle,
-        columns: columns,
-        items: items
-    };
-
-    // Convert to JSON string
-    const jsonString = JSON.stringify(boardData, null, 4);
-
-    // Trigger download
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${boardTitle.replace(/\s+/g, '_')}_board.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
+exportBtn.addEventListener("click", exportBoard);
 
 //Handle import board
 importBtn.addEventListener("click", () => {
@@ -696,37 +747,7 @@ importBtn.addEventListener("click", () => {
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-
-                // Clear existing board
-                kanbanContainer.innerHTML = '';
-                columnCounter = 0;
-                itemCounter = 0;
-
-                // Set board title
-                const boardTitleElem = document.getElementById('board-title');
-                boardTitleElem.innerText = data.title || 'Agile Base Board';
-
-                const columnsMap = {};
-
-                // Create columns in order using existing function
-                data.columns.forEach(colTitle => {
-                    createNewColumn(); // increments columnCounter
-                    const newColumn = kanbanContainer.lastElementChild;
-                    const titleElem = newColumn.querySelector('.column-title');
-                    titleElem.innerText = colTitle;
-                    columnsMap[colTitle] = newColumn;
-                });
-
-                // Add items using existing function
-                data.items.forEach(item => {
-                    const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
-                    createNewKanbanItem(item.text, targetColumn);
-                });
-
-                // Re-initialize listeners for drag/drop, delete buttons, placeholders
-                initializeBoard();
-                
-
+                importBoardData(data);
             } catch (err) {
                 alert('Failed to import board: ' + err.message);
             }
@@ -818,45 +839,6 @@ document.addEventListener("click", (e) => {
         sandwichMenu.style.display = "none";
     }
 });
-
-//Import from a JSON export stored on GitHub via raw github link
-function importBoardFromURL(url) {
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not OK');
-            return response.json();
-        })
-        .then(data => {
-            // Clear existing board
-            kanbanContainer.innerHTML = '';
-            columnCounter = 0;
-            itemCounter = 0;
-
-            // Set board title
-            const boardTitleElem = document.getElementById('board-title');
-            boardTitleElem.innerText = data.title || 'Agile Base Board';
-
-            const columnsMap = {};
-
-            // Create columns
-            data.columns.forEach(colTitle => {
-                createNewColumn(); 
-                const newColumn = kanbanContainer.lastElementChild;
-                const titleElem = newColumn.querySelector('.column-title');
-                titleElem.innerText = colTitle;
-                columnsMap[colTitle] = newColumn;
-            });
-
-            // Add items
-            data.items.forEach(item => {
-                const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
-                createNewKanbanItem(item.text, targetColumn);
-            });
-
-            // Reinitialize listeners
-            initializeBoard();
-        }).catch(err => alert('Failed to import board: ' + err.message));
-}
 
 //Attach the URL param listener to the DOM
 window.addEventListener('DOMContentLoaded', () => {
