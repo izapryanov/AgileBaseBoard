@@ -297,33 +297,29 @@ const initializeItemListeners = () => {
     const content = item.querySelector('.kanban-item-content');
     const delBtn = item.querySelector('.delete-item-btn');
 
-    // --- Prevent drag when interacting with editable text
-    content.addEventListener('mousedown', () => {
-      item.draggable = false;
-    });
-    content.addEventListener('mouseup', () => {
-      item.draggable = true;
-    });
-    content.addEventListener('mouseleave', () => {
-      item.draggable = true;
+    // --- Desktop (mouse)
+    [content, delBtn].forEach(el => {
+      el.addEventListener('mousedown', () => item.draggable = false);
+      el.addEventListener('mouseup', () => item.draggable = true);
+      el.addEventListener('mouseleave', () => item.draggable = true);
     });
 
-    // --- Prevent drag when clicking delete button
-    delBtn.addEventListener('mousedown', () => {
-      item.draggable = false;
-    });
-    delBtn.addEventListener('mouseup', () => {
-      item.draggable = true;
-    });
-    delBtn.addEventListener('mouseleave', () => {
-      item.draggable = true;
+    // --- Mobile (touch)
+    [content, delBtn].forEach(el => {
+      el.addEventListener('touchstart', () => item.draggable = false, { passive: true });
+      el.addEventListener('touchend', () => item.draggable = true);
+      el.addEventListener('touchcancel', () => item.draggable = true);
     });
 
-    // Your normal drag events
+    // --- Normal drag handlers
     item.addEventListener('dragstart', handleItemDragStart);
     item.addEventListener('dragend', handleItemDragEnd);
+
+    // --- Your existing touch-based drag logic
+    item.addEventListener('touchstart', handleItemTouchStart);
   });
 };
+
 
 /**
  * Handles the dragstart event for a mouse.
