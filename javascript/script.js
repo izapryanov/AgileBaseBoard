@@ -1,5 +1,6 @@
  // Get references to key elements
 const kanbanContainer = document.getElementById('kanban-container');
+const boardTitle = document.getElementById('board-title');
 const addBtn = document.getElementById('add-btn');
 const addMenu = document.getElementById('add-menu');
 const addColumnOptionBtn = document.getElementById('add-column-option-btn');
@@ -464,7 +465,7 @@ const createNewKanbanItem = (itemText, targetColumn = null) => {
 
 //Export board to JSON
 const exportBoardData = () => {
-    const boardTitle = document.getElementById('board-title').innerText.trim();
+    const bTitle = boardTitle.innerText.trim();
 
     // Collect column titles in order
     const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
@@ -482,7 +483,7 @@ const exportBoardData = () => {
 
     // Construct flat JSON object
     const boardData = {
-        title: boardTitle,
+        title: bTitle,
         columns: columns,
         items: items
     };
@@ -492,7 +493,7 @@ const exportBoardData = () => {
 const exportBoard = () =>{
 
     const boardData = exportBoardData();
-    const boardTitle = boardData.title;
+    const bTitle = boardData.title;
 
     // Convert to JSON string
     const jsonString = JSON.stringify(boardData, null, 4);
@@ -502,7 +503,7 @@ const exportBoard = () =>{
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${boardTitle.replace(/\s+/g, '_')}_board.json`;
+    a.download = `${bTitle.replace(/\s+/g, '_')}_board.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -518,8 +519,7 @@ const importBoardData = (data) => {
         itemCounter = 0;
 
         // Set board title
-        const boardTitleElem = document.getElementById('board-title');
-        boardTitleElem.innerText = data.title || 'Agile Base Board';
+        boardTitle.innerText = data.title || 'Agile Base Board';
 
         const columnsMap = {};
 
@@ -781,6 +781,7 @@ confirmClearBoardBtn.addEventListener("click", () => {
     if (importURL) {
         importBoardFromURL(importURL);
     } else {
+        boardTitle.innerText = 'Agile Base Board';
         kanbanContainer.innerHTML = ` <!-- To Do Column -->
             <div id="todo-column" class="column">
                 <div class="column-header" draggable="true">
