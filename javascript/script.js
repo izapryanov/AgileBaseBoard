@@ -462,8 +462,8 @@ const createNewKanbanItem = (itemText, targetColumn = null) => {
     return newItem;
 };
 
-//Export board function
-const exportBoard = () =>{
+//Export board to JSON
+const exportBoardData = () => {
     const boardTitle = document.getElementById('board-title').innerText.trim();
 
     // Collect column titles in order
@@ -486,6 +486,13 @@ const exportBoard = () =>{
         columns: columns,
         items: items
     };
+    return boardData;
+}
+//Export board function
+const exportBoard = () =>{
+
+    const boardData = exportBoardData();
+    const boardTitle = boardData.title;
 
     // Convert to JSON string
     const jsonString = JSON.stringify(boardData, null, 4);
