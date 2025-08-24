@@ -42,47 +42,8 @@ const confirmClearBoardBtn = document.getElementById('confirm-clear-board-btn');
 const cancelClearBoardBtn = document.getElementById('cancel-clear-board-btn');
 
 
-/**
- * Attaches drag, drop, and touch listeners to all existing columns.
- */
-const initializeColumnListeners = () => {
-    const columns = document.querySelectorAll('.column');
-    columns.forEach(column => {
-        const header = column.querySelector('.column-header');
-        
-        // Remove existing listeners to prevent duplicates
-        if (header) {
-            header.removeEventListener('dragstart', handleColumnDragStart);
-            header.removeEventListener('dragend', handleColumnDragEnd);
-            header.removeEventListener('touchstart', handleColumnTouchStart);
-            // Remove dblclick listener if present
-            column.removeEventListener('dblclick', handleColumnDoubleClick);
-        }
-        column.removeEventListener('dragover', handleItemDragOver);
-        column.removeEventListener('drop', handleItemDrop);
 
-        // Add new listeners for columns
-        if (header) {
-            header.addEventListener('dragstart', handleColumnDragStart);
-            header.addEventListener('dragend', handleColumnDragEnd);
-            
-            // Touch events for columns
-            header.addEventListener('touchstart', handleColumnTouchStart);
-            // Add dblclick to create a new empty item in the column
-            column.addEventListener('dblclick', handleColumnDoubleClick);
-        }
-        
-        // Item dragging within columns
-        column.addEventListener('dragover', handleItemDragOver);
-        column.addEventListener('drop', handleItemDrop);
-    });
-
-    // Add dragover/drop listeners to the container for column reordering
-    kanbanContainer.removeEventListener('dragover', handleColumnDragOver);
-    kanbanContainer.removeEventListener('drop', handleColumnDrop);
-    kanbanContainer.addEventListener('dragover', handleColumnDragOver);
-    kanbanContainer.addEventListener('drop', handleColumnDrop);
-};
+/************* HANDLERS **************/
 
 /**
  * Handles the dragstart event for a column.
@@ -269,60 +230,6 @@ const handleItemDrop = e => {
 };
 
 /**
- * Determines the element to place the dragged item after.
- * @param {HTMLElement} column The column element.
- * @param {number} y The y-coordinate of the mouse/touch.
- * @returns {HTMLElement | null} The element to place the new item after.
- */
-const getDragAfterElement = (column, y) => {
-    const draggableItems = [...column.querySelectorAll('.kanban-item:not(.is-dragging)')];
-    return draggableItems.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-};
-
-
-/**
- * Attaches drag and touch listeners to all existing items.
- */
-const initializeItemListeners = () => {
-  const items = document.querySelectorAll('.kanban-item');
-
-  items.forEach(item => {
-    const content = item.querySelector('.kanban-item-content');
-    const delBtn = item.querySelector('.delete-item-btn');
-
-    // --- Desktop (mouse)
-    [content, delBtn].forEach(el => {
-      el.addEventListener('mousedown', () => item.draggable = false);
-      el.addEventListener('mouseup', () => item.draggable = true);
-      el.addEventListener('mouseleave', () => item.draggable = true);
-    });
-
-    // --- Mobile (touch)
-    [content, delBtn].forEach(el => {
-      el.addEventListener('touchstart', () => item.draggable = false, { passive: true });
-      el.addEventListener('touchend', () => item.draggable = true);
-      el.addEventListener('touchcancel', () => item.draggable = true);
-    });
-
-    // --- Normal drag handlers
-    item.addEventListener('dragstart', handleItemDragStart);
-    item.addEventListener('dragend', handleItemDragEnd);
-
-    // --- Your existing touch-based drag logic
-    item.addEventListener('touchstart', handleItemTouchStart);
-  });
-};
-
-
-/**
  * Handles the dragstart event for a mouse.
  * @param {Event} e The drag event.
  */
@@ -394,171 +301,6 @@ const handleItemTouchStart = e => {
 };
 
 /**
- * Creates a new column element.
- */
-const createNewColumn = () => {
-    columnCounter++;
-    const newColumn = document.createElement('div');
-    newColumn.id = `new-column-${columnCounter}`;
-    newColumn.classList.add('column');
-    newColumn.innerHTML = `
-        <div class="column-header" draggable="true">
-            <h2 contenteditable="true" class="column-title">New Column</h2>
-            <button class="delete-column-btn">
-                <!-- Trash can icon for deleting a column -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
-        </div>
-    `;
-    kanbanContainer.appendChild(newColumn);
-    initializeColumnListeners();
-    initializeDeleteColumnButtons();
-    updateColumnPlaceholders();
-};
-
-//Update column placeholder
-function updateColumnPlaceholders() {
-    document.querySelectorAll('.column').forEach(column => {
-        if (column.querySelectorAll('.kanban-item').length === 0) {
-        column.classList.add('empty');
-        } else {
-        column.classList.remove('empty');
-        }
-    });
-}
-
-/**
- * Creates a new kanban item with a delete button and given text.
- * The new item's content is now also editable.
- */
-        
-const createNewKanbanItem = (itemText, targetColumn = null) => {
-    // Create a new kanban item and append it to the given column (or the first column if none provided)
-    itemCounter++;
-    const newItem = document.createElement('div');
-    newItem.id = `item-${itemCounter}`;
-    newItem.classList.add('kanban-item');
-    newItem.draggable = true;
-    newItem.innerHTML = `
-
-                <span class="kanban-item-content" contenteditable="true" data-placeholder="Start typing here">${itemText}</span>
-                <button class="delete-item-btn">
-                    <!-- Trash can icon for deleting an item -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
-
-    `;
-    // Decide which column to append to
-    const columnToAppend = targetColumn || kanbanContainer.querySelector('.column');
-    if (columnToAppend) {
-        columnToAppend.appendChild(newItem);
-        // Re-initialize listeners so the new item behaves like others
-        initializeItemListeners();
-        initializeDeleteItemButtons();
-    }
-    return newItem;
-};
-
-//Export board to JSON
-const exportBoardData = () => {
-    const bTitle = boardTitle.innerText.trim();
-
-    // Collect column titles in order
-    const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
-        .map(column => column.querySelector('.column-title').innerText.trim());
-
-    // Collect all items with their column reference
-    const items = [];
-    Array.from(document.querySelectorAll('.kanban-container .column')).forEach(column => {
-        const columnTitle = column.querySelector('.column-title').innerText.trim();
-        Array.from(column.querySelectorAll('.kanban-item')).forEach(item => {
-            const text = item.querySelector('.kanban-item-content').innerText.trim();
-            items.push({ text, column: columnTitle });
-        });
-    });
-
-    // Construct flat JSON object
-    const boardData = {
-        title: bTitle,
-        columns: columns,
-        items: items
-    };
-    return boardData;
-}
-//Export board function
-const exportBoard = () =>{
-
-    const boardData = exportBoardData();
-    const bTitle = boardData.title;
-
-    // Convert to JSON string
-    const jsonString = JSON.stringify(boardData, null, 4);
-
-    // Trigger download
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${bTitle.replace(/\s+/g, '_')}_board.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-//Import board data
-const importBoardData = (data) => {
-    try {
-         // Clear existing board
-        kanbanContainer.innerHTML = '';
-        columnCounter = 0;
-        itemCounter = 0;
-
-        // Set board title
-        boardTitle.innerText = data.title || 'Agile Base Board';
-
-        const columnsMap = {};
-
-        // Create columns in order using existing function
-        data.columns.forEach(colTitle => {
-            createNewColumn(); // increments columnCounter
-            const newColumn = kanbanContainer.lastElementChild;
-            const titleElem = newColumn.querySelector('.column-title');
-            titleElem.innerText = colTitle;
-            columnsMap[colTitle] = newColumn;
-        });
-
-        // Add items using existing function
-        data.items.forEach(item => {
-            const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
-            createNewKanbanItem(item.text, targetColumn);
-        });
-
-        // Re-initialize listeners for drag/drop, delete buttons, placeholders
-        initializeBoard();
-    } catch (err) {
-        alert('Failed to import board data: ' + err.message);
-    }
-}
-
-//Import from a JSON export stored on GitHub via raw github link
-function importBoardFromURL(url) {
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not OK');
-            return response.json();
-        })
-        .then(data => {
-            importBoardData(data);
-        }).catch(err => alert('Failed to import board: ' + err.message));
-}
-
-
-/**
  * Handles double-clicks on a column to add a new empty item to that column.
  * Ignores double-clicks that happen on existing items or on column headers/buttons.
  */
@@ -625,6 +367,334 @@ const handleDeleteItemClick = e => {
     itemToDelete = e.currentTarget.closest('.kanban-item');
     itemModal.style.display = 'flex';
 };
+
+
+
+
+/************* FUNCTIONS **************/
+
+/**
+ * Attaches drag, drop, and touch listeners to all existing columns.
+ */
+function initializeColumnListeners() {
+    const columns = document.querySelectorAll('.column');
+    columns.forEach(column => {
+        const header = column.querySelector('.column-header');
+        
+        // Remove existing listeners to prevent duplicates
+        if (header) {
+            header.removeEventListener('dragstart', handleColumnDragStart);
+            header.removeEventListener('dragend', handleColumnDragEnd);
+            header.removeEventListener('touchstart', handleColumnTouchStart);
+            // Remove dblclick listener if present
+            column.removeEventListener('dblclick', handleColumnDoubleClick);
+        }
+        column.removeEventListener('dragover', handleItemDragOver);
+        column.removeEventListener('drop', handleItemDrop);
+
+        // Add new listeners for columns
+        if (header) {
+            header.addEventListener('dragstart', handleColumnDragStart);
+            header.addEventListener('dragend', handleColumnDragEnd);
+            
+            // Touch events for columns
+            header.addEventListener('touchstart', handleColumnTouchStart);
+            // Add dblclick to create a new empty item in the column
+            column.addEventListener('dblclick', handleColumnDoubleClick);
+        }
+        
+        // Item dragging within columns
+        column.addEventListener('dragover', handleItemDragOver);
+        column.addEventListener('drop', handleItemDrop);
+    });
+
+    // Add dragover/drop listeners to the container for column reordering
+    kanbanContainer.removeEventListener('dragover', handleColumnDragOver);
+    kanbanContainer.removeEventListener('drop', handleColumnDrop);
+    kanbanContainer.addEventListener('dragover', handleColumnDragOver);
+    kanbanContainer.addEventListener('drop', handleColumnDrop);
+};
+
+/**
+ * Attaches drag and touch listeners to all existing items.
+ */
+function initializeItemListeners() {
+  const items = document.querySelectorAll('.kanban-item');
+
+  items.forEach(item => {
+    const content = item.querySelector('.kanban-item-content');
+    const delBtn = item.querySelector('.delete-item-btn');
+
+    // --- Desktop (mouse)
+    [content, delBtn].forEach(el => {
+      el.addEventListener('mousedown', () => item.draggable = false);
+      el.addEventListener('mouseup', () => item.draggable = true);
+      el.addEventListener('mouseleave', () => item.draggable = true);
+    });
+
+    // --- Mobile (touch)
+    [content, delBtn].forEach(el => {
+      el.addEventListener('touchstart', () => item.draggable = false, { passive: true });
+      el.addEventListener('touchend', () => item.draggable = true);
+      el.addEventListener('touchcancel', () => item.draggable = true);
+    });
+
+    // --- Normal drag handlers
+    item.addEventListener('dragstart', handleItemDragStart);
+    item.addEventListener('dragend', handleItemDragEnd);
+
+    // --- Your existing touch-based drag logic
+    item.addEventListener('touchstart', handleItemTouchStart);
+  });
+};
+
+/**
+ * Determines the element to place the dragged item after.
+ * @param {HTMLElement} column The column element.
+ * @param {number} y The y-coordinate of the mouse/touch.
+ * @returns {HTMLElement | null} The element to place the new item after.
+ */
+function getDragAfterElement(column, y) {
+    const draggableItems = [...column.querySelectorAll('.kanban-item:not(.is-dragging)')];
+    return draggableItems.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+};
+
+/**
+ * Creates a new column element.
+ */
+function createNewColumn() {
+    columnCounter++;
+    const newColumn = document.createElement('div');
+    newColumn.id = `new-column-${columnCounter}`;
+    newColumn.classList.add('column');
+    newColumn.innerHTML = `
+        <div class="column-header" draggable="true">
+            <h2 contenteditable="true" class="column-title">New Column</h2>
+            <button class="delete-column-btn">
+                <!-- Trash can icon for deleting a column -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </div>
+    `;
+    kanbanContainer.appendChild(newColumn);
+    initializeColumnListeners();
+    initializeDeleteColumnButtons();
+    updateColumnPlaceholders();
+};
+
+//Update column placeholder
+function updateColumnPlaceholders() {
+    document.querySelectorAll('.column').forEach(column => {
+        if (column.querySelectorAll('.kanban-item').length === 0) {
+        column.classList.add('empty');
+        } else {
+        column.classList.remove('empty');
+        }
+    });
+}
+
+/**
+ * Creates a new kanban item with a delete button and given text.
+ * The new item's content is now also editable.
+ */
+        
+function createNewKanbanItem(itemText, targetColumn = null) {
+    // Create a new kanban item and append it to the given column (or the first column if none provided)
+    itemCounter++;
+    const newItem = document.createElement('div');
+    newItem.id = `item-${itemCounter}`;
+    newItem.classList.add('kanban-item');
+    newItem.draggable = true;
+    newItem.innerHTML = `
+
+                <span class="kanban-item-content" contenteditable="true" data-placeholder="Start typing here">${itemText}</span>
+                <button class="delete-item-btn">
+                    <!-- Trash can icon for deleting an item -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+
+    `;
+    // Decide which column to append to
+    const columnToAppend = targetColumn || kanbanContainer.querySelector('.column');
+    if (columnToAppend) {
+        columnToAppend.appendChild(newItem);
+        // Re-initialize listeners so the new item behaves like others
+        initializeItemListeners();
+        initializeDeleteItemButtons();
+    }
+    return newItem;
+};
+
+//Export board to JSON
+function exportBoardData() {
+    const bTitle = boardTitle.innerText.trim();
+
+    // Collect column titles in order
+    const columns = Array.from(document.querySelectorAll('.kanban-container .column'))
+        .map(column => column.querySelector('.column-title').innerText.trim());
+
+    // Collect all items with their column reference
+    const items = [];
+    Array.from(document.querySelectorAll('.kanban-container .column')).forEach(column => {
+        const columnTitle = column.querySelector('.column-title').innerText.trim();
+        Array.from(column.querySelectorAll('.kanban-item')).forEach(item => {
+            const text = item.querySelector('.kanban-item-content').innerText.trim();
+            items.push({ text, column: columnTitle });
+        });
+    });
+
+    // Construct flat JSON object
+    const boardData = {
+        title: bTitle,
+        columns: columns,
+        items: items
+    };
+    return boardData;
+}
+//Export board function
+function exportBoard() {
+
+    const boardData = exportBoardData();
+    const bTitle = boardData.title;
+
+    // Convert to JSON string
+    const jsonString = JSON.stringify(boardData, null, 4);
+
+    // Trigger download
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${bTitle.replace(/\s+/g, '_')}_board.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+//Import board data
+function importBoardData(data) {
+    try {
+         // Clear existing board
+        kanbanContainer.innerHTML = '';
+        columnCounter = 0;
+        itemCounter = 0;
+
+        // Set board title
+        boardTitle.innerText = data.title || 'Agile Base Board';
+
+        const columnsMap = {};
+
+        // Create columns in order using existing function
+        data.columns.forEach(colTitle => {
+            createNewColumn(); // increments columnCounter
+            const newColumn = kanbanContainer.lastElementChild;
+            const titleElem = newColumn.querySelector('.column-title');
+            titleElem.innerText = colTitle;
+            columnsMap[colTitle] = newColumn;
+        });
+
+        // Add items using existing function
+        data.items.forEach(item => {
+            const targetColumn = columnsMap[item.column] || kanbanContainer.querySelector('.column');
+            createNewKanbanItem(item.text, targetColumn);
+        });
+
+        // Re-initialize listeners for drag/drop, delete buttons, placeholders
+        initializeBoard();
+    } catch (err) {
+        alert('Failed to import board data: ' + err.message);
+    }
+}
+
+//Import from a JSON export stored on GitHub via raw github link
+function importBoardFromURL(url) {
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not OK');
+            return response.json();
+        })
+        .then(data => {
+            importBoardData(data);
+        }).catch(err => alert('Failed to import board: ' + err.message));
+}
+
+//Clear board 
+function clearBoard() {
+    boardTitle.innerText = 'Agile Base Board';
+    kanbanContainer.innerHTML = ` <!-- To Do Column -->
+        <div id="todo-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">To Do</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Placeholder item -->
+            <div id="item-1" draggable="true" class="kanban-item">
+                <span class="kanban-item-content" contenteditable="true" data-placeholder="Start typing here"></span>
+                <button class="delete-item-btn">
+                    <!-- Trash can icon for deleting an item -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div id="in-progress-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">In Progress</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Done Column -->
+        <div id="done-column" class="column">
+            <div class="column-header" draggable="true">
+                <h2 contenteditable="true" class="column-title">Done</h2>
+                <button class="delete-column-btn">
+                    <!-- Trash can icon for deleting a column -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>`;
+    initializeBoard();
+}
+
+// Initial setup for the existing elements
+function initializeBoard(){
+    initializeItemListeners();
+    initializeColumnListeners();
+    initializeDeleteColumnButtons();
+    initializeDeleteItemButtons();
+    updateColumnPlaceholders();
+}
+
+/*********** EVENT LISTENERS ***********/
 
 // Event listener for the "Yes, delete it" button for columns
 confirmDeleteColumnBtn.addEventListener('click', () => {
@@ -767,7 +837,6 @@ importBtn.addEventListener("click", () => {
     sandwichMenu.style.display = "none";
 });
 
-//Handle clear board
 //Hanlde clear board menu item click
 clearBtn.addEventListener("click", () => {
   sandwichMenu.style.display = "none";
@@ -781,56 +850,7 @@ confirmClearBoardBtn.addEventListener("click", () => {
     if (importURL) {
         importBoardFromURL(importURL);
     } else {
-        boardTitle.innerText = 'Agile Base Board';
-        kanbanContainer.innerHTML = ` <!-- To Do Column -->
-            <div id="todo-column" class="column">
-                <div class="column-header" draggable="true">
-                    <h2 contenteditable="true" class="column-title">To Do</h2>
-                    <button class="delete-column-btn">
-                        <!-- Trash can icon for deleting a column -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-                <!-- Placeholder item -->
-                <div id="item-1" draggable="true" class="kanban-item">
-                    <span class="kanban-item-content" contenteditable="true" data-placeholder="Start typing here"></span>
-                    <button class="delete-item-btn">
-                        <!-- Trash can icon for deleting an item -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- In Progress Column -->
-            <div id="in-progress-column" class="column">
-                <div class="column-header" draggable="true">
-                    <h2 contenteditable="true" class="column-title">In Progress</h2>
-                    <button class="delete-column-btn">
-                        <!-- Trash can icon for deleting a column -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Done Column -->
-            <div id="done-column" class="column">
-                <div class="column-header" draggable="true">
-                    <h2 contenteditable="true" class="column-title">Done</h2>
-                    <button class="delete-column-btn">
-                        <!-- Trash can icon for deleting a column -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>`;
-        initializeBoard();
+        clearBoard();
     }
     clearBoardModal.style.display = 'none';
 
@@ -856,14 +876,5 @@ window.addEventListener('DOMContentLoaded', () => {
         importBoardFromURL(importURL);
     }
 });
-
-// Initial setup for the existing elements
-const initializeBoard = () =>{
-    initializeItemListeners();
-    initializeColumnListeners();
-    initializeDeleteColumnButtons();
-    initializeDeleteItemButtons();
-    updateColumnPlaceholders();
-}
 
 initializeBoard();
