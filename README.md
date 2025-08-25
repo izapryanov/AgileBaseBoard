@@ -61,7 +61,7 @@ All changes are reflected in real-time, and the board can be exported or importe
    - Select a previously exported JSON file.
    - The board will be rebuilt with all columns and items in the correct order.
 3. **Import via GitHub raw url**
-   - Add the *import* URL parameter e.g. www.agilebaseboard.com/?import = [raw URL to a JSON export file part of <u>publc github repo</u>]
+   - Add the *import* URL parameter e.g. www.agilebaseboard.com/?import = (raw URL to a JSON export file part of <u>publc github repo</u>)
    - Load the page with the parameter and this will import the JSON export.
 
 ### Additional Features
