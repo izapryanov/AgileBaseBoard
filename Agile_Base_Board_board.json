@@ -7,23 +7,23 @@
     ],
     "items": [
         {
+            "text": "Add browser local storage caching to prevent losing work in progress.",
+            "column": "To Do"
+        },
+        {
             "text": "Add export to GitHub: 1. Exports the content of the board in a JSON format, and keeps it in the copy buffer; 2. Then opens GitHub edit link to the previously imported JSON export stored in GitHub.",
             "column": "To Do"
         },
         {
-            "text": "Add dark/night mode",
+            "text": "Add JIRA export file - one which can be imported in JIRA later.",
             "column": "To Do"
         },
         {
-            "text": "Create GitHub pages page for the project",
+            "text": "Add Export options menu with 3 Options: 1. JSON, 2. GitHub 3. JIRA",
             "column": "To Do"
         },
         {
-            "text": "Buy a proper domain name",
-            "column": "To Do"
-        },
-        {
-            "text": "Add browser local storage caching to prevent losing work in progress.",
+            "text": "Fix flaky behavior on tap /delete buttons and typing/ on mobile",
             "column": "To Do"
         },
         {
@@ -32,6 +32,10 @@
         },
         {
             "text": "Add ID to the item - generated based on the board name.",
+            "column": "To Do"
+        },
+        {
+            "text": "Add dark/night mode",
             "column": "To Do"
         },
         {
@@ -56,6 +60,14 @@
         },
         {
             "text": "Add url parameter 'import' to be used with GitHub raw link and import json exports sotred in a GitHub project. - [DONE Note: Don't use the \"/ref/head/main/\" url, it lacks behind, use the \"/main/\" only url]",
+            "column": "Done"
+        },
+        {
+            "text": "Buy a proper domain name and setup DNS",
+            "column": "Done"
+        },
+        {
+            "text": "Create GitHub pages page for the project",
             "column": "Done"
         },
         {
