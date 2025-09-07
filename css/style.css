@@ -38,6 +38,12 @@ body {
     background-color: #f9fafb;
 }
 
+#board-title.cached::after {
+  content: " *";
+  color: blue;
+  pointer-events: none; /* so it doesn’t interfere with editing */ 
+}
+
 /* Main container for the columns */
 .kanban-container {
     display: flex;

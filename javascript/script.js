@@ -18,6 +18,16 @@ const importBtn = document.getElementById("import-btn");
 const clearBtn = document.getElementById("clear-board-btn");
 const feedbackBtn = document.getElementById("feedback-btn");
 
+
+//Local browser storage keys
+const BOARD_STORAGE_KEY = "agileBaseBoard"; //Main storage for a board
+const URL_IMPORT_DATA_STORAGE_KEY = "agileBaseBoardUrlImportData";//The data from the source URL import
+const URL_IMPORT_SOURCE_STORAGE_KEY = "agileBaseBoardUrlImportSource"; //The source URL
+
+//Cached indicator - shows that a board data has been loaded from local storage
+const cachedIndicator = "*"; //"💾";⁽ˡᵒᶜᵃˡ⁾; ⁽ᶜᵃᶜʰᵉᵈ⁾;
+
+//Variables
 let columnCounter = 3;
 let itemCounter = 1;
 let draggingItem = null;
@@ -297,6 +307,11 @@ const handleItemTouchStart = e => {
 
         document.addEventListener('touchmove', onTouchMove);
         document.addEventListener('touchend', onTouchEnd);
+
+        const active = document.activeElement;
+        if (active.isContentEditable && !active.contains(e.target)) {
+            active.blur(); // manually force blur when tapping outside
+        }
     }
 };
 
@@ -369,7 +384,197 @@ const handleDeleteItemClick = e => {
 };
 
 
+/*********** EVENT LISTENERS ***********/
 
+// Event listener for the "Yes, delete it" button for columns
+confirmDeleteColumnBtn.addEventListener('click', () => {
+    if (columnToDelete) {
+        columnToDelete.remove();
+        columnToDelete = null;
+    }
+    columnModal.style.display = 'none';
+});
+
+// Event listener for the "No, keep it" button for columns
+cancelDeleteColumnBtn.addEventListener('click', () => {
+    columnModal.style.display = 'none';
+    columnToDelete = null;
+});
+
+// Event listener for the "Yes, delete it" button for items
+confirmDeleteItemBtn.addEventListener('click', () => {
+    if (itemToDelete) {
+        itemToDelete.remove();
+        itemToDelete = null;
+        updateColumnPlaceholders(); 
+    }
+    itemModal.style.display = 'none';
+    
+});
+
+// Event listener for the "No, keep it" button for items
+cancelDeleteItemBtn.addEventListener('click', () => {
+    itemModal.style.display = 'none';
+    itemToDelete = null;
+});
+
+// Hide modal if the user clicks outside of the modal content
+columnModal.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        columnModal.style.display = 'none';
+        columnToDelete = null;
+    }
+});
+
+// Hide modal if the user clicks outside of the modal content
+itemModal.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        itemModal.style.display = 'none';
+        itemToDelete = null;
+    }
+});
+
+// --- New Button Logic ---
+// Toggle the add menu when the main button is clicked
+addBtn.addEventListener('click', () => {
+    addMenu.style.display = addMenu.style.display === 'flex' ? 'none' : 'flex';
+});
+
+// Add a new column when the option is selected
+addColumnOptionBtn.addEventListener('click', () => {
+    createNewColumn();
+    addMenu.style.display = 'none';
+});
+
+// Show the create item modal when the option is selected
+addItemOptionBtn.addEventListener('click', () => {
+    createItemModal.style.display = 'flex';
+    addMenu.style.display = 'none';
+});
+
+// Handle the creation of a new item from the modal
+createNewItemBtn.addEventListener('click', () => {
+    const itemText = newItemInput.value.trim();
+    if (itemText) {
+        createNewKanbanItem(itemText);
+        newItemInput.value = ''; // Clear the input field
+        createItemModal.style.display = 'none';
+        updateColumnPlaceholders();
+    }
+});
+
+// Cancel the item creation modal
+cancelCreateItemBtn.addEventListener('click', () => {
+    newItemInput.value = ''; // Clear the input field
+    createItemModal.style.display = 'none';
+});
+
+// Hide the item creation modal if user clicks outside
+createItemModal.addEventListener('click', (e) => {
+    if (e.target.id === 'create-item-modal') {
+        createItemModal.style.display = 'none';
+        newItemInput.value = '';
+    }
+});
+
+//Show the sandwitch button menu
+sandwichBtn.addEventListener("click", () => {
+    sandwichMenu.style.display = sandwichMenu.style.display === "flex" ? "none" : "flex";
+});
+
+//Open readme.md when help button is clicked
+helpBtn.addEventListener("click", () => {
+    window.open("https://github.com/izapryanov/AgileBaseBoard/blob/main/README.md", "_blank");
+});
+
+//Open GitHub project page for Agile Base Board
+gitHubBtn.addEventListener("click", () => {
+    window.open("https://github.com/izapryanov/AgileBaseBoard", "_blank");
+});
+
+//Open feedback form
+feedbackBtn.addEventListener("click", () =>{
+    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdVyhnGg3mFAXMetWCYGsaE7bcYXUvR2nf6sE9rDDxddEWapQ/viewform?usp=header", "_blank");
+})
+
+//Handle export board 
+exportBtn.addEventListener("click", exportBoard);
+
+//Handle import board
+importBtn.addEventListener("click", () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/json';
+
+    fileInput.addEventListener('change', event => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                importBoardData(data);
+            } catch (err) {
+                alert('Failed to import board: ' + err.message);
+            }
+        };
+
+        reader.readAsText(file);
+    });
+
+    fileInput.click();
+    sandwichMenu.style.display = "none";
+});
+
+//Hanlde clear board menu item click
+clearBtn.addEventListener("click", () => {
+  sandwichMenu.style.display = "none";
+  clearBoardModal.style.display = 'flex';
+});
+
+//Handle clear board confirm
+confirmClearBoardBtn.addEventListener("click", () => {
+    const params = new URLSearchParams(window.location.search);
+    const importURL = params.get('import');
+    clearBoard();
+    clearBoardCache();
+    if (importURL) {
+        importBoardFromURL(importURL);
+    } 
+    clearBoardModal.style.display = 'none';
+
+});
+
+//Handle clear board cancel
+cancelClearBoardBtn.addEventListener("click", () => {
+    clearBoardModal.style.display = 'none';
+});
+
+// Hide menu when clicking outside
+document.addEventListener("click", (e) => {
+    if (!sandwichBtn.contains(e.target) && !sandwichMenu.contains(e.target)) {
+        sandwichMenu.style.display = "none";
+    }
+});
+
+//Add listeners on exit content editable divs to trigger save cache
+//Add listener on focusin to save current value on start editing to compare later for changes
+document.addEventListener("focusin", (e) => {
+  if (e.target.isContentEditable) {
+    // Save original value when user starts editing
+    e.target.dataset.oldValue = e.target.innerHTML;
+  }
+});
+
+//Add listener on focusout to trigger save cache if there were changes
+document.addEventListener("focusout", (e) => {
+  if (e.target.isContentEditable) {
+    if (e.target.innerHTML !== e.target.dataset.oldValue) {
+        saveBoardToCache();
+    }
+  }
+});
 
 /************* FUNCTIONS **************/
 
@@ -620,7 +825,7 @@ function importBoardData(data) {
 }
 
 //Import from a JSON export stored on GitHub via raw github link
-function importBoardFromURL(url) {
+function importBoardFromURL(url, onSuccessCallback=undefined) {
     fetch(url)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not OK');
@@ -628,6 +833,9 @@ function importBoardFromURL(url) {
         })
         .then(data => {
             importBoardData(data);
+            if(onSuccessCallback){
+                onSuccessCallback();
+            }
         }).catch(err => alert('Failed to import board: ' + err.message));
 }
 
@@ -685,6 +893,48 @@ function clearBoard() {
     initializeBoard();
 }
 
+//Board caching in the local browser storage 
+//Save board to cache
+function saveBoardToCache() {
+    const data = exportBoardData();
+    const importUrl = getImportURLParamValue();
+
+    const cachedSourceUrl = localStorage.getItem(URL_IMPORT_SOURCE_STORAGE_KEY);
+    const cachedURLImportData = loadBoardDataFromCache(URL_IMPORT_DATA_STORAGE_KEY);
+    const cachedBoardData = loadBoardDataFromCache(BOARD_STORAGE_KEY);
+
+    if (importUrl) {
+        if (cachedURLImportData && cachedSourceUrl === importUrl) {
+            // If same URL, cache exists → save edits to cache
+            localStorage.setItem(URL_IMPORT_DATA_STORAGE_KEY, JSON.stringify(data));
+        } else {
+            //If it is the first time for this URL save to cache the URL and the data
+            localStorage.setItem(URL_IMPORT_DATA_STORAGE_KEY, JSON.stringify(data));
+            localStorage.setItem(URL_IMPORT_SOURCE_STORAGE_KEY,importUrl);
+        }
+    } else {
+        //If there is no import param save cached board
+        localStorage.setItem(BOARD_STORAGE_KEY,JSON.stringify(data));
+    }
+    console.log('Saving board to cache');
+}
+
+//Load board export from cache
+function loadBoardDataFromCache(storageKey) {
+  const data = localStorage.getItem(storageKey);
+  return data ? JSON.parse(data) : null;
+}
+
+//Clear board cache
+function clearBoardCache () {
+    localStorage.removeItem(BOARD_STORAGE_KEY);
+    localStorage.removeItem(URL_IMPORT_DATA_STORAGE_KEY);
+    localStorage.removeItem(URL_IMPORT_SOURCE_STORAGE_KEY);
+    
+    //Clear cached indicator to the board title
+    boardTitle.classList.toggle("cached", false);
+}
+
 // Initial setup for the existing elements
 function initializeBoard(){
     initializeItemListeners();
@@ -694,187 +944,47 @@ function initializeBoard(){
     updateColumnPlaceholders();
 }
 
-/*********** EVENT LISTENERS ***********/
+// Get the import URL parameter value (an import URL)
+function getImportURLParamValue (){
+    const urlParams = new URLSearchParams(window.location.search);
+    const importUrl = urlParams.get("import");
+    return importUrl;
+}
 
-// Event listener for the "Yes, delete it" button for columns
-confirmDeleteColumnBtn.addEventListener('click', () => {
-    if (columnToDelete) {
-        columnToDelete.remove();
-        columnToDelete = null;
-    }
-    columnModal.style.display = 'none';
-});
+//Initialize on load
+function initialize(){
+    const importUrl = getImportURLParamValue();
 
-// Event listener for the "No, keep it" button for columns
-cancelDeleteColumnBtn.addEventListener('click', () => {
-    columnModal.style.display = 'none';
-    columnToDelete = null;
-});
+    const cachedSourceUrl = localStorage.getItem(URL_IMPORT_SOURCE_STORAGE_KEY);
+    const cachedURLImportData = loadBoardDataFromCache(URL_IMPORT_DATA_STORAGE_KEY);
+    const cachedBoardData = loadBoardDataFromCache(BOARD_STORAGE_KEY);
 
-// Event listener for the "Yes, delete it" button for items
-confirmDeleteItemBtn.addEventListener('click', () => {
-    if (itemToDelete) {
-        itemToDelete.remove();
-        itemToDelete = null;
-        updateColumnPlaceholders(); 
-    }
-    itemModal.style.display = 'none';
-    
-});
+    if (importUrl) {
+        if (cachedURLImportData && cachedSourceUrl === importUrl) {
+            // If same URL, cache exists → load cached edits
+            importBoardData(cachedURLImportData);
 
-// Event listener for the "No, keep it" button for items
-cancelDeleteItemBtn.addEventListener('click', () => {
-    itemModal.style.display = 'none';
-    itemToDelete = null;
-});
+            //Add cached indicator to the board title
+            boardTitle.classList.toggle("cached", true);
 
-// Hide modal if the user clicks outside of the modal content
-columnModal.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        columnModal.style.display = 'none';
-        columnToDelete = null;
-    }
-});
+        } else {
+            importBoardFromURL(importUrl, () => {
+                saveBoardToCache();
+            });
+        }
+    } else if (cachedBoardData) {
+        //If there is no import param, but cache exists → load cached board
+        importBoardData(cachedBoardData);
 
-// Hide modal if the user clicks outside of the modal content
-itemModal.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        itemModal.style.display = 'none';
-        itemToDelete = null;
-    }
-});
+        //Add cached indicator to the board title
+        boardTitle.classList.toggle("cached", true);
 
-// --- New Button Logic ---
-// Toggle the add menu when the main button is clicked
-addBtn.addEventListener('click', () => {
-    addMenu.style.display = addMenu.style.display === 'flex' ? 'none' : 'flex';
-});
-
-// Add a new column when the option is selected
-addColumnOptionBtn.addEventListener('click', () => {
-    createNewColumn();
-    addMenu.style.display = 'none';
-});
-
-// Show the create item modal when the option is selected
-addItemOptionBtn.addEventListener('click', () => {
-    createItemModal.style.display = 'flex';
-    addMenu.style.display = 'none';
-});
-
-// Handle the creation of a new item from the modal
-createNewItemBtn.addEventListener('click', () => {
-    const itemText = newItemInput.value.trim();
-    if (itemText) {
-        createNewKanbanItem(itemText);
-        newItemInput.value = ''; // Clear the input field
-        createItemModal.style.display = 'none';
-        updateColumnPlaceholders();
-    }
-});
-
-// Cancel the item creation modal
-cancelCreateItemBtn.addEventListener('click', () => {
-    newItemInput.value = ''; // Clear the input field
-    createItemModal.style.display = 'none';
-});
-
-// Hide the item creation modal if user clicks outside
-createItemModal.addEventListener('click', (e) => {
-    if (e.target.id === 'create-item-modal') {
-        createItemModal.style.display = 'none';
-        newItemInput.value = '';
-    }
-});
-
-//Show the sandwitch button menu
-sandwichBtn.addEventListener("click", () => {
-    sandwichMenu.style.display = sandwichMenu.style.display === "flex" ? "none" : "flex";
-});
-
-//Open readme.md when help button is clicked
-helpBtn.addEventListener("click", () => {
-    window.open("https://github.com/izapryanov/AgileBaseBoard/blob/main/README.md", "_blank");
-});
-
-//Open GitHub project page for Agile Base Board
-gitHubBtn.addEventListener("click", () => {
-    window.open("https://github.com/izapryanov/AgileBaseBoard", "_blank");
-});
-
-//Open feedback form
-feedbackBtn.addEventListener("click", () =>{
-    window.open("https://docs.google.com/forms/d/e/1FAIpQLSdVyhnGg3mFAXMetWCYGsaE7bcYXUvR2nf6sE9rDDxddEWapQ/viewform?usp=header", "_blank");
-})
-
-//Handle export board 
-exportBtn.addEventListener("click", exportBoard);
-
-//Handle import board
-importBtn.addEventListener("click", () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'application/json';
-
-    fileInput.addEventListener('change', event => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                importBoardData(data);
-            } catch (err) {
-                alert('Failed to import board: ' + err.message);
-            }
-        };
-
-        reader.readAsText(file);
-    });
-
-    fileInput.click();
-    sandwichMenu.style.display = "none";
-});
-
-//Hanlde clear board menu item click
-clearBtn.addEventListener("click", () => {
-  sandwichMenu.style.display = "none";
-  clearBoardModal.style.display = 'flex';
-});
-
-//Handle clear board confirm
-confirmClearBoardBtn.addEventListener("click", () => {
-    const params = new URLSearchParams(window.location.search);
-    const importURL = params.get('import');
-    if (importURL) {
-        importBoardFromURL(importURL);
+        
     } else {
         clearBoard();
     }
-    clearBoardModal.style.display = 'none';
 
-});
+    initializeBoard();
+}
 
-//Handle clear board cancel
-cancelClearBoardBtn.addEventListener("click", () => {
-    clearBoardModal.style.display = 'none';
-});
-
-// Hide menu when clicking outside
-document.addEventListener("click", (e) => {
-    if (!sandwichBtn.contains(e.target) && !sandwichMenu.contains(e.target)) {
-        sandwichMenu.style.display = "none";
-    }
-});
-
-//Attach the URL param listener to the DOM
-window.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const importURL = params.get('import');
-    if (importURL) {
-        importBoardFromURL(importURL);
-    }
-});
-
-initializeBoard();
+initialize();
