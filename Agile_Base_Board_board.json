@@ -23,7 +23,7 @@
             "column": "To Do"
         },
         {
-            "text": "Add a switch button to turn on or off local browser storage board caching - default on.",
+            "text": "Add a switch button to turn on or off local browser storage board caching - default on. \n1ver. -  May be the button can be show cache hide cache, that would allow for using the same board for intermittent work without breaking the cache. May additional clear cache button beside this one.\n2 ver. - May be the switch button clear the cache on turn-off and strarts the caching again on turn-on.\n3 ver. - May be both are valid behaviors and can be configured from a configuration.",
             "column": "To Do"
         },
         {
