@@ -19,6 +19,14 @@
             "column": "To Do"
         },
         {
+            "text": "Add an icon button at the top left for switching between multiple column mode ▮▯▯ (kanban) and single column mode ▯ (list)",
+            "column": "To Do"
+        },
+        {
+            "text": "Add a switch button to turn on or off local browser storage board caching - default on.",
+            "column": "To Do"
+        },
+        {
             "text": "Fix flaky behavior on tap /delete buttons and typing/ on mobile",
             "column": "To Do"
         },
@@ -51,11 +59,7 @@
             "column": "To Do"
         },
         {
-            "text": "Add a switch button to turn on or off local browser storage board caching - default on.",
-            "column": "To Do"
-        },
-        {
-            "text": "Add an icon button at the top left for switching between multiple column mode ▮▯▯ (kanban) and single column mode ▯ (list)",
+            "text": "Add a function to transform head and web repo import URLs to raw URL's from the main branch.",
             "column": "To Do"
         },
         {
