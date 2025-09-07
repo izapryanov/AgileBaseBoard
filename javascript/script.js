@@ -116,6 +116,7 @@ const handleColumnDrop = e => {
         draggingColumn = null;
         placeholder = null;
     }
+    saveBoardToCache();
 };
 
 /**
@@ -203,6 +204,7 @@ const handleColumnTouchStart = e => {
         draggingColumn.style.zIndex = '';
         draggingColumn = null;
         placeholder = null;
+        saveBoardToCache();
     };
 
     document.addEventListener('touchmove', onTouchMove);
@@ -255,6 +257,7 @@ const handleItemDragStart = e => {
  */
 const handleItemDragEnd = e => {
     e.target.classList.remove('is-dragging');
+    saveBoardToCache();
 };
 
 /**
@@ -391,6 +394,7 @@ confirmDeleteColumnBtn.addEventListener('click', () => {
     if (columnToDelete) {
         columnToDelete.remove();
         columnToDelete = null;
+        saveBoardToCache();
     }
     columnModal.style.display = 'none';
 });
@@ -407,6 +411,7 @@ confirmDeleteItemBtn.addEventListener('click', () => {
         itemToDelete.remove();
         itemToDelete = null;
         updateColumnPlaceholders(); 
+        saveBoardToCache();
     }
     itemModal.style.display = 'none';
     
@@ -701,9 +706,9 @@ function createNewColumn() {
 function updateColumnPlaceholders() {
     document.querySelectorAll('.column').forEach(column => {
         if (column.querySelectorAll('.kanban-item').length === 0) {
-        column.classList.add('empty');
+            column.classList.add('empty');
         } else {
-        column.classList.remove('empty');
+            column.classList.remove('empty');
         }
     });
 }
