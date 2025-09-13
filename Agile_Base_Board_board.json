@@ -23,7 +23,7 @@
             "column": "To Do"
         },
         {
-            "text": "Add a switch button to turn on or off local browser storage board caching - default on. \n1ver. -  May be the button can be show cache hide cache, that would allow for using the same board for intermittent work without breaking the cache. May additional clear cache button beside this one.\n2 ver. - May be the switch button clear the cache on turn-off and strarts the caching again on turn-on.\n3 ver. - May be both are valid behaviors and can be configured from a configuration.",
+            "text": "Add a switch button to turn on or off local browser storage board caching - default on.  1ver. -  May be the button can be show cache hide cache, that would allow for using the same board for intermittent work without breaking the cache. May additional clear cache button beside this one. 2 ver. - May be the switch button clear the cache on turn-off and strarts the caching again on turn-on. 3 ver. - May be both are valid behaviors and can be configured from a configuration.",
             "column": "To Do"
         },
         {
@@ -61,6 +61,10 @@
         {
             "text": "Add a function to transform head and web repo import URLs to raw URL's from the main branch.",
             "column": "To Do"
+        },
+        {
+            "text": "Add inserting of an item within other items on double click.",
+            "column": "Done"
         },
         {
             "text": "Add url parameter 'import' to be used with GitHub raw link and import json exports sotred in a GitHub project. - [DONE Note: Don't use the \"/ref/head/main/\" url, it lacks behind, use the \"/main/\" only url]",
