@@ -331,11 +331,27 @@ const handleColumnDoubleClick = (e) => {
         e.target.closest('.column-header') ||
         e.target.closest('.delete-item-btn') ||
         e.target.closest('.delete-column-btn')) {
-    return;
+            return;
+    }
+
+    //Determine index to add the new item based on mouse position
+    const children = column.children;
+    let insertIndex = children.length;
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (child.classList.contains('kanban-item')){
+            const rect = child.getBoundingClientRect();
+            const middle = rect.top + rect.height / 2;
+            if (e.clientY < middle) {
+                insertIndex = i;
+                break;
+            }
+        }
+        
     }
 
     // Create an empty (editable) item in this column
-    const newItem = createNewKanbanItem('', column);
+    const newItem = createNewKanbanItem('', column, insertIndex);
 
     // Focus the editable span after adding
     newItem.querySelector('.kanban-item-content').focus();
@@ -718,7 +734,7 @@ function updateColumnPlaceholders() {
  * The new item's content is now also editable.
  */
         
-function createNewKanbanItem(itemText, targetColumn = null) {
+function createNewKanbanItem(itemText, targetColumn = null, index = null) {
     // Create a new kanban item and append it to the given column (or the first column if none provided)
     itemCounter++;
     const newItem = document.createElement('div');
@@ -738,8 +754,13 @@ function createNewKanbanItem(itemText, targetColumn = null) {
     `;
     // Decide which column to append to
     const columnToAppend = targetColumn || kanbanContainer.querySelector('.column');
+    const children = columnToAppend.children;
     if (columnToAppend) {
-        columnToAppend.appendChild(newItem);
+        if (index && index < children.length) {
+            columnToAppend.insertBefore(newItem, children[index]);
+        } else {
+            columnToAppend.appendChild(newItem);
+        }
         // Re-initialize listeners so the new item behaves like others
         initializeItemListeners();
         initializeDeleteItemButtons();
